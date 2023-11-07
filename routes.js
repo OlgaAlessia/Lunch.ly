@@ -122,13 +122,15 @@ router.post("/:id/edit/", async function (req, res, next) {
 router.post("/:id/add-reservation/", async function (req, res, next) {
   try {
     const customerId = req.params.id;
-    const startAt = new Date(req.body.startAt);
+    const dateAt = new Date(req.body.dateAt);
+    const timeAt = req.body.timeAt;
     const numGuests = req.body.numGuests;
     const notes = req.body.notes;
 
     const reservation = new Reservation({
       customerId,
-      startAt,
+      dateAt,
+      timeAt,
       numGuests,
       notes
     });
@@ -152,11 +154,13 @@ router.get("/edit-reservation/:id", async function(req, res, next){
   }
 });
 
+
 /** Handle edit a reservation */
 router.post("/edit-reservation/:id", async function(req,res,next){
   try {
     const reservation = await Reservation.get(req.params.id);
-    reservation.startAt = req.body.startAt;
+    reservation.dateAt = req.body.dateAt;
+    reservation.timeAt = req.body.timeAt;
     reservation.numGuests = req.body.numGuests;
     reservation.notes = req.body.notes;
     await reservation.save();

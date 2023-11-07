@@ -6,13 +6,22 @@
 
 <form action="/edit-reservation/{{ reservation.id }}" method="POST">
     <h1>Edit Reservation</h1>
-
     <div class="form-group">
-      <label for="startAt">Start</label>
-      <input id="startAt"
-              class="form-control"
-              name="startAt"
-              value="{{ reservation.getformattedInputStartAt() }}">
+      <label for="dateAt">Date</label>
+      <input id="dateAt"
+             type="date"
+             class="form-control"
+             name="dateAt"
+             pattern="\d{4}-\d{2}-\d{2}"
+             value="{{ reservation.getInputStartAt() }}">
+    </div>
+    <div class="form-group">
+      <label for="timeAt">Time</label>
+      <input id="timeAt"
+             type="time"
+             class="form-control"
+             name="timeAt"
+             value="{{ reservation.timeAt }}">
     </div>
     <div class="form-group">
       <label for="numGuests"># of Guests:</label>

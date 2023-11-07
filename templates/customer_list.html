@@ -9,6 +9,8 @@
 <ul style="column-count: 4">
   {% for customer in customers %}
   <li><a href="/{{ customer.id }}/">{{ customer.fullName }}</a></li>
+  {% else %}
+    <div class="col-12">No customer found</div>
   {% endfor %}
 </ul>
 

@@ -7,11 +7,12 @@ const db = require("../db");
 /** A reservation for a party */
 
 class Reservation {
-  constructor({ id, customerId, numGuests, startAt, notes }) {
+  constructor({ id, customerId, numGuests, dateAt, timeAt, notes }) {
     this.id = id;
     this.customerId = customerId;
     this.numGuests = numGuests;
-    this.startAt = startAt;
+    this.dateAt = dateAt;
+    this.timeAt = timeAt;
     this.notes = notes;
   }
 
@@ -37,15 +38,28 @@ class Reservation {
   }
 
   /** get reservation the date  */
-  get startAt() {
-    return this._startAt;
+  get dateAt() {
+    return this._dateAt;
   }
-  set startAt(val) {
+  set dateAt(val) {
     if (val !== "Invalid Date") {
-      this._startAt = val;
+      this._dateAt = val;
     }
     else {
       throw new Error("Please put a valid date");
+    }
+  }
+
+  /** get reservation the time  */
+  get timeAt() {
+    return this._timeAt;
+  }
+  set timeAt(val) {
+    if (val !== "Invalid Time") {
+      this._timeAt = val;
+    }
+    else {
+      throw new Error("Please put a valid time");
     }
   }
 
@@ -70,7 +84,8 @@ class Reservation {
       `SELECT id, 
         customer_id AS "customerId", 
         num_guests AS "numGuests", 
-        start_at AS "startAt", 
+        date_at AS "dateAt",
+        time_at AS "timeAt",
         notes AS "notes"
       FROM reservations
       WHERE id = $1`, [id]
@@ -81,14 +96,17 @@ class Reservation {
 
   /** formatter for startAt */
 
-  getformattedStartAt() {
-    return moment(this.startAt).format('MMMM Do YYYY, h:mm');
+  //getformattedStartAt() {
+  //  return moment(this.startAt).format('MMMM Do YYYY, h:mm');
+  //}
+
+  getStartAt() {
+    return moment(this.dateAt).format('MMMM Do YYYY') + ' ' + this.timeAt;
   }
 
-  getformattedInputStartAt() {
-    return moment(this.startAt).format('MMMM Do YYYY h:mm');
+  getInputStartAt() {
+    return moment(this.dateAt).format('YYYY-MM-DD');
   }
-
 
   /** given a customer id, find their reservations. */
 
@@ -97,7 +115,8 @@ class Reservation {
       `SELECT id, 
         customer_id AS "customerId", 
         num_guests AS "numGuests", 
-        start_at AS "startAt", 
+        date_at AS "dateAt",
+        time_at AS "timeAt",
         notes AS "notes"
       FROM reservations 
       WHERE customer_id = $1`, [customerId]
@@ -110,17 +129,17 @@ class Reservation {
   async save() {
     if (this.id === undefined) {
       const result = await db.query(
-        `INSERT INTO reservations (customer_id, start_at, num_guests, notes) 
-        VALUES ($1, $2, $3, $4)
+        `INSERT INTO reservations (customer_id, date_at, time_at, num_guests, notes) 
+        VALUES ($1, $2, $3, $4, $5)
         RETURNING id`,
-        [this.customerId, this.startAt, this.numGuests, this.notes]
+        [this.customerId, this.dateAt, this.timeAt, this.numGuests, this.notes]
       );
       this.id = result.rows[0].id;
     } else {
       await db.query(
-        `UPDATE reservations SET start_at=$1, num_guests=$2, notes=$3
-        WHERE id=$4`,
-        [this.startAt, this.numGuests, this.notes, this.id]
+        `UPDATE reservations SET date_at=$1, time_at=$2, num_guests=$3, notes=$4
+        WHERE id=$5`,
+        [this.dateAt, this.timeAt, this.numGuests, this.notes, this.id]
       );
     }
   }
